@@ -1,5 +1,42 @@
 ## ElasticSearch DSL Snippets
 
+### List Nested Fields
+
+```python
+# Pass data on format: users = [
+#         {'first_name': 'Mikael', 'last_name': 'Santilio'},
+#         {'first_name': 'Joao', 'last_name': 'Silva'}
+#     ]
+users = fields.ListField(
+    fields.NestedField(
+        properties={
+            'first_name': fields.TextField(
+                analyzer=html_strip,
+                fields={'raw': fields.KeywordField()}
+            ),
+            'last_name': fields.TextField(
+                analyzer=html_strip,
+                fields={'raw': fields.KeywordField()}
+            ),
+        },)
+)
+
+# OR
+
+users = fields.NestedField(
+    properties={
+        'first_name': fields.TextField(
+            analyzer=html_strip,
+            fields={'raw': fields.KeywordField()}
+        ),
+        'last_name': fields.TextField(
+            analyzer=html_strip,
+            fields={'raw': fields.KeywordField()}
+        ),
+    },
+   multi=True)
+```
+
 ### Check Changes on Bulk Files Elastic Search
 
 ```python
@@ -224,7 +261,6 @@ class SQLAlchemyTimestampDocument(SQLAlchemyDocument):
             parallel=parallel,
             **kwargs
         )
-
 
 ```
 

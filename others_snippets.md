@@ -1,10 +1,32 @@
-## Snippets 01
+## Django Code Snippets
 
 
-### Imports
+### Imports Django
 
 ```python
 from django.conf import settings
+from django.contrib import messages
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.messages.views import SuccessMessageMixin
+from django.core.exceptions import PermissionDenied
+from django.db import transaction
+from django.http import HttpResponseRedirect
+from django.shortcuts import get_object_or_404, redirect
+from django.urls import reverse, reverse_lazy
+from django.utils import timezone
+from django.views.generic import CreateView, DetailView, TemplateView, UpdateView
+
+```
+
+### Imports Django
+
+```python
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import filters, status, viewsets
+from rest_framework.decorators import action
+from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
+from rest_framework.permissions import AllowAny, IsAdminUser
+from rest_framework.response import Response
 
 ```
 
@@ -56,6 +78,33 @@ def active_superuser(sender, instance, **kwargs):
 
 
 post_save.connect(active_superuser, sender=User)
+```
+
+### Form Kwargs
+```python
+# views.py
+class FormViewMixin():
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['author_pk'] = self.request.user.pk
+        return kwargs
+
+# forms.py
+from django import forms
+from books.models import Book
+
+class BookForm(forms.ModelForm):
+
+    def __init__(self, *args, **kwargs):
+        genre_pk = kwargs.pop('genre_pk')
+
+        super().__init__(*args, **kwargs)
+        self.fields['author'].queryset = self.fields['author'].queryset.filter(genre__pk=genre_pk)
+
+    class Meta:
+        model = Book
+        fields = '__all__'
 ```
 
 
